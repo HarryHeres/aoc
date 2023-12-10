@@ -1,9 +1,43 @@
 use std::{
     fs::File,
-    io::{BufReader, Read},
+    io::{BufReader, Read, Seek, SeekFrom},
+    ops::Range,
 };
 
-fn part_one(reader: &mut BufReader<File>) -> u32 {
+fn part_two(reader: &mut BufReader<File>, farthest: usize, path: &Vec<usize>) -> u32 {
+    let mut lines: String = String::new();
+    reader
+        .read_to_string(&mut lines)
+        .expect("Could not read lines to string");
+
+    let line_len: usize = lines.find("\n").unwrap();
+
+    let farthest_idx = path[farthest];
+    let start_idx = lines
+        .find('S')
+        .expect("Could not find the start 'S' character");
+
+    let start_line = start_idx % line_len;
+    let end_line = farthest_idx % line_len;
+
+    let count = 0;
+    for i in start_line..=end_line {
+        let idx_range: Range<usize> = i * line_len..i * line_len + line_len;
+        let mut indices: Vec<usize> = Vec::new();
+
+        for idx in path {
+            if idx_range.contains(idx) {
+                indices.push(*idx);
+            }
+        }
+
+        let idx_beg = indices.;
+    }
+
+    return count;
+}
+
+fn part_one(reader: &mut BufReader<File>) -> (usize, Vec<usize>) {
     let mut lines: String = String::new();
     reader
         .read_to_string(&mut lines)
@@ -160,7 +194,7 @@ fn part_one(reader: &mut BufReader<File>) -> u32 {
         }
     }
 
-    let mut lowest_len = valid_paths.iter().map(|path| path.len()).min().unwrap_or(0);
+    let mut lowest_len: usize = valid_paths.iter().map(|path| path.len()).min().unwrap_or(0);
     'outer: for i in 0..lowest_len {
         let curr = valid_paths[0][i];
         for j in 1..valid_paths.len() {
@@ -172,13 +206,20 @@ fn part_one(reader: &mut BufReader<File>) -> u32 {
         break;
     }
 
-    return lowest_len as u32;
+    return (lowest_len, valid_paths[0].clone());
 }
 
 fn main() {
     let file: File = File::open("input.txt").expect("Could not open the input file");
     let mut reader: BufReader<File> = BufReader::new(file);
 
-    let farthest = part_one(&mut reader);
-    println!("Sum (part one): {farthest}")
+    let (farthest, path) = part_one(&mut reader);
+    println!("Sum (part one): {farthest}");
+
+    reader
+        .seek(SeekFrom::Start(0))
+        .expect("Could not seek to the beginning of the file");
+
+    let enclosed = part_two(&mut reader, farthest, &path);
+    println!("Sum (part two) {enclosed}");
 }
