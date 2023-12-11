@@ -4,25 +4,19 @@ use std::{
     ops::Range,
 };
 
-fn part_two(reader: &mut BufReader<File>, farthest: usize, path: &Vec<usize>) -> u32 {
+fn part_two(reader: &mut BufReader<File>, path: &Vec<usize>) -> u32 {
     let mut lines: String = String::new();
     reader
         .read_to_string(&mut lines)
         .expect("Could not read lines to string");
 
-    let line_len: usize = lines.find("\n").unwrap();
+    let line_len: usize = lines.find("\n").unwrap() + 1;
 
-    let farthest_idx = path[farthest];
-    let start_idx = lines
-        .find('S')
-        .expect("Could not find the start 'S' character");
+    let end_line = lines.len() / line_len;
+    let mut count = 0;
 
-    let start_line = start_idx % line_len;
-    let end_line = farthest_idx % line_len;
-
-    let count = 0;
-    for i in start_line..=end_line {
-        let idx_range: Range<usize> = i * line_len..i * line_len + line_len;
+    for i in 0..end_line {
+        let idx_range: Range<usize> = i * line_len..i * line_len + line_len - 1;
         let mut indices: Vec<usize> = Vec::new();
 
         for idx in path {
@@ -31,7 +25,31 @@ fn part_two(reader: &mut BufReader<File>, farthest: usize, path: &Vec<usize>) ->
             }
         }
 
-        let idx_beg = indices.;
+        if indices.len() == 0 {
+            continue;
+        }
+
+        indices.sort();
+        let loop_range = indices[0]..indices[indices.len() - 1];
+        // Jordan curve theorem
+        for j in loop_range {
+            match lines.chars().nth(j).unwrap() {
+                '.' => {
+                    let range = j..idx_range.end;
+                    let mut intersections = 0;
+                    for k in range {
+                        if indices.contains(&k) {
+                            intersections += 1;
+                        }
+                    }
+
+                    if intersections % 2 != 0 {
+                        count += 1;
+                    }
+                }
+                _ => continue,
+            }
+        }
     }
 
     return count;
@@ -183,6 +201,7 @@ fn part_one(reader: &mut BufReader<File>) -> (usize, Vec<usize>) {
                 }
 
                 'S' => {
+                    path.push(curr_idx);
                     valid_paths.push(path);
                     break;
                 }
@@ -206,11 +225,15 @@ fn part_one(reader: &mut BufReader<File>) -> (usize, Vec<usize>) {
         break;
     }
 
+    // for el in &valid_paths[0] {
+    //     print!("{} -> ", lines.chars().nth(*el).unwrap());
+    // }
+
     return (lowest_len, valid_paths[0].clone());
 }
 
 fn main() {
-    let file: File = File::open("input.txt").expect("Could not open the input file");
+    let file: File = File::open("input_example_6.txt").expect("Could not open the input file");
     let mut reader: BufReader<File> = BufReader::new(file);
 
     let (farthest, path) = part_one(&mut reader);
@@ -220,6 +243,6 @@ fn main() {
         .seek(SeekFrom::Start(0))
         .expect("Could not seek to the beginning of the file");
 
-    let enclosed = part_two(&mut reader, farthest, &path);
+    let enclosed = part_two(&mut reader, &path);
     println!("Sum (part two) {enclosed}");
 }
