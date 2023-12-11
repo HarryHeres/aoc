@@ -14,15 +14,18 @@ func findShortestPathFromTo(lines: [String.SubSequence], from: Galaxy, to: Galax
 }
 
 
-func expandGalaxy(lines: inout [String.SubSequence]) {
+// DISCLAIMER: Horrible optimization, do not use above 1k at this state
+func expandGalaxy(lines: inout [String.SubSequence], expandMultiplier: UInt32) {
     // Parse all empty lines 
     var rowOffset = 0
     for rowIdx in 0..<lines.count {
         let currLine = lines[rowIdx + rowOffset]
          if !currLine.contains("#") {
             print("Found empty row at \(rowIdx)")
-            lines.insert(currLine, at: rowIdx + rowOffset)
-            rowOffset += 1
+            for _ in 0..<expandMultiplier {
+                lines.insert(currLine, at: rowIdx + rowOffset)
+                rowOffset += 1
+            }
         }
      }
 
@@ -41,14 +44,17 @@ func expandGalaxy(lines: inout [String.SubSequence]) {
         }
         if colEmpty == true {
             // print("Found empty collumn at \(colIdx)")
-            for i in 0..<lines.count {
-                var line = lines[i]
-                let insertIdx = line.index(line.startIndex, offsetBy: Int(colIdx + colOffset))
-                line.insert(".", at: insertIdx)
-                lines[i] = line
-            }
+            for _ in 0..<expandMultiplier {
+                for i in 0..<lines.count {
+                    var line = lines[i]
+                    let insertIdx = line.index(line.startIndex, offsetBy: Int(colIdx + colOffset))
+                    line.insert(".", at: insertIdx)
+                    lines[i] = line
+                }
             colOffset += 1
-        }
+
+            }
+                    }
         colEmpty = true
     } 
 
@@ -58,11 +64,14 @@ func expandGalaxy(lines: inout [String.SubSequence]) {
 }
 
 
-func partOne(lines: inout [String.SubSequence]) -> UInt32 {
+func partOneAndTwo(lines: inout [String.SubSequence]) -> UInt32 {
     var sum: UInt32 = 0
 
     // Expand the galaxy appropriately
-    expandGalaxy(lines: &lines)
+
+    // expandGalaxy(lines: &lines, expandMultiplier: 1) // Part one
+     expandGalaxy(lines: &lines, expandMultiplier: 9) // Part example
+    // expandGalaxy(lines: &lines, expandMultiplier: 999999) // Part two
 
     // Find all galaxies
     var galaxies: [Galaxy] = [Galaxy]()
@@ -79,7 +88,7 @@ func partOne(lines: inout [String.SubSequence]) -> UInt32 {
 
     print("Found \(galaxies.count) galaxies")
 
-    for i in 0..<galaxies.count - 1{
+    for i in 0..<galaxies.count - 1 {
         for j in i + 1..<galaxies.count {
             let pathLen = findShortestPathFromTo(lines: lines, from: galaxies[i], to: galaxies[j])
             print("Path len from \(i) to \(j) is \(pathLen)")
@@ -95,7 +104,7 @@ func main() {
     let file: String = "input.txt";
     var contents: [String.SubSequence] = try! String(contentsOfFile: file).split(separator: "\n")
     
-    let sum: UInt32 = partOne(lines: &contents)
+    let sum: UInt32 = partOneAndTwo(lines: &contents)
     print("Sum (part one): \(sum)")
 }
 
