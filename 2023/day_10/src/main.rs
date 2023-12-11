@@ -17,37 +17,43 @@ fn part_two(reader: &mut BufReader<File>, path: &Vec<usize>) -> u32 {
 
     for i in 0..end_line {
         let idx_range: Range<usize> = i * line_len..i * line_len + line_len - 1;
-        let mut indices: Vec<usize> = Vec::new();
+        let mut last_relevant: char = '\0';
+        let mut inside: bool = false;
 
-        for idx in path {
-            if idx_range.contains(idx) {
-                indices.push(*idx);
-            }
-        }
-
-        if indices.len() == 0 {
-            continue;
-        }
-
-        indices.sort();
-        let loop_range = indices[0]..indices[indices.len() - 1];
-        // Jordan curve theorem
-        for j in loop_range {
-            match lines.chars().nth(j).unwrap() {
+        // Jordan curve theorem algorithm
+        for j in idx_range {
+            let curr_char = lines.chars().nth(j).unwrap();
+            match curr_char {
                 '.' => {
-                    let range = j..idx_range.end;
-                    let mut intersections = 0;
-                    for k in range {
-                        if indices.contains(&k) {
-                            intersections += 1;
-                        }
-                    }
-
-                    if intersections % 2 != 0 {
+                    last_relevant = '.';
+                    if inside == true {
                         count += 1;
                     }
                 }
-                _ => continue,
+                '|' => {
+                    inside = !inside;
+                }
+
+                '-' => continue,
+                // S case ???
+                other => {
+                    // F, 7, L, J
+                    if path.contains(&j) {
+                        if last_relevant == '.' {
+                            last_relevant = other;
+                            inside = !inside;
+                        } else {
+                            match (last_relevant, other) {
+                                ('J', 'L') | ('L', 'J') | ('7', 'F') | ('F', '7') => {
+                                    inside = !inside;
+                                }
+
+                                (_, _) => (),
+                            }
+                            last_relevant = '.';
+                        }
+                    }
+                }
             }
         }
     }
@@ -233,7 +239,7 @@ fn part_one(reader: &mut BufReader<File>) -> (usize, Vec<usize>) {
 }
 
 fn main() {
-    let file: File = File::open("input_example_6.txt").expect("Could not open the input file");
+    let file: File = File::open("input.txt").expect("Could not open the input file");
     let mut reader: BufReader<File> = BufReader::new(file);
 
     let (farthest, path) = part_one(&mut reader);
