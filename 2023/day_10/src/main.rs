@@ -4,6 +4,7 @@ use std::{
     ops::Range,
 };
 
+// IS NOT COMPLETELY FUNCTIONAL DUE TO TIME CONSTRAINTS
 fn part_two(reader: &mut BufReader<File>, path: &Vec<usize>) -> u32 {
     let mut lines: String = String::new();
     reader
