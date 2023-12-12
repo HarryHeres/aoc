@@ -17,56 +17,63 @@ fn check_if_comb_valid(current: &String, correct: &Vec<u32>) -> bool {
 }
 
 // NOTE: Tried to find a mathematical solution but did not find (but was very close, though)
-// Best would be DP and recursion with memoize, but not enough time to implement that.
+// Best would probably be DP and recursion with memoize, but not enough time to implement that.
+// Might get back to it later.
 // Brute force worked for part one, too long for part two
 fn find_unfolded_combinations(damaged: &String, correct: &Vec<u32>) -> u64 {
     let mut sum = 0;
-    match (
-        damaged.chars().nth(0).unwrap(),
-        damaged.chars().last().unwrap(),
-    ) {
-        ('?', '?') => {
-            let unfolded: String = (damaged.clone() + "?").to_string();
 
-            let x = find_combinations(damaged, correct);
-            let y = find_combinations(&unfolded, correct);
-            sum = x * y.pow(4);
-        }
-        (_, '?') => {
-            let unfolded: String = ("?".to_string() + damaged.clone().as_str()).to_string();
+    let unfolded: String = damaged.clone() + "?";
+    let x = find_combinations(damaged, correct);
+    let y = find_combinations(&unfolded, correct);
+    sum = x * y.pow(4);
 
-            let x = find_combinations(damaged, correct);
-            let y = find_combinations(&unfolded, correct);
-            sum = x * y.pow(4);
-        }
-        ('?', _) => {
-            let a = find_combinations(damaged, correct);
+    // match (
+    //     damaged.chars().nth(0).unwrap(),
+    //     damaged.chars().last().unwrap(),
+    // ) {
+    //     ('?', '?') => {
+    //         let unfolded: String = (damaged.clone() + "?").to_string();
 
-            let mut unfolded: String = damaged.clone() + "?";
-            let b = find_combinations(&unfolded, correct);
+    //         let x = find_combinations(damaged, correct);
+    //         let y = find_combinations(&unfolded, correct);
+    //         sum = x * y.pow(4);
+    //     }
+    //     (_, '?') => {
+    //         let unfolded: String = ("?".to_string() + damaged.clone().as_str()).to_string();
 
-            unfolded = "?".to_string() + damaged.clone().as_str();
-            let c = find_combinations(&unfolded, correct);
+    //         let x = find_combinations(damaged, correct);
+    //         let y = find_combinations(&unfolded, correct);
+    //         sum = x * y.pow(4);
+    //     }
+    //     ('?', _) => {
+    //         let a = find_combinations(damaged, correct);
 
-            unfolded = "?".to_string() + unfolded.as_str();
-            let d = find_combinations(&unfolded, correct);
+    //         let mut unfolded: String = damaged.clone() + "?";
+    //         let b = find_combinations(&unfolded, correct);
 
-            sum = a.pow(1) * b.pow(1) * c.pow(2) * d.pow(1); // 1 1 2 1
-            println!("{sum}")
-        }
-        (_, _) => {
-            let unfolded: String = ("?".to_string() + damaged.clone().as_str()).to_string();
+    //         unfolded = "?".to_string() + damaged.clone().as_str();
+    //         let c = find_combinations(&unfolded, correct);
 
-            let x = find_combinations(damaged, correct);
-            let y = find_combinations(&unfolded, correct);
-            sum = x * y.pow(4);
-        }
-    }
+    //         unfolded = "?".to_string() + unfolded.as_str();
+    //         let d = find_combinations(&unfolded, correct);
+
+    //         sum = a.pow(1) * b.pow(1) * c.pow(2) * d.pow(1); // 1 1 2 1
+    //         println!("{sum}")
+    //     }
+    //     (_, _) => {
+    //         let unfolded: String = ("?".to_string() + damaged.clone().as_str()).to_string();
+
+    //         let x = find_combinations(damaged, correct);
+    //         let y = find_combinations(&unfolded, correct);
+    //         sum = x * y.pow(4);
+    //     }
+    // }
 
     return sum;
 }
 
-// Works flawlessly
+// Works flawlessly for part one
 fn find_combinations(damaged: &String, correct: &Vec<u32>) -> u64 {
     let mut count = 0;
 
@@ -106,6 +113,7 @@ fn find_combinations(damaged: &String, correct: &Vec<u32>) -> u64 {
     return count;
 }
 
+// Unfolding part two - for greedy solution
 // fn unfold_line(line: &mut String, correct: &mut String) {
 //     let unfold_count = 4;
 
@@ -142,6 +150,7 @@ fn part_two(reader: &mut BufReader<File>) -> u64 {
     return sum;
 }
 
+// Basically brute-force for part one
 fn part_one(reader: &mut BufReader<File>) -> u64 {
     let mut parsed: Vec<(String, String)> = Vec::new();
 
@@ -173,6 +182,6 @@ fn main() {
         .seek(SeekFrom::Start(0))
         .expect("Could not seek to the beginning of the file");
 
-    // let sum = part_two(&mut reader);
-    // println!("Sum (part two): {sum}");
+    let sum = part_two(&mut reader);
+    println!("Sum (part two): {sum}");
 }
