@@ -29,9 +29,6 @@ func partTwo(strings: [String.SubSequence]) -> UInt64 {
         let label: String = String(tmp[..<opIdx])
         let op: Character = tmp[opIdx] 
 
-
-
-
         let boxId = Int(hash(string: label))
         var currBox = boxList[boxId]
         switch(op){
