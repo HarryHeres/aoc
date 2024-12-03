@@ -12,23 +12,53 @@ int main(int argc, char **argv) {
   fread(buffer, 1, file_size, input);
 
   long long rv = 0;
+  bool active = true;
   for (int i = 0; i < file_size; ++i) {
-    if (buffer[i] != 'm') {
-      continue;
-    }
 
-    const uint skip = check_for_match(file_size, buffer, i, &rv);
-    if (skip > 0) {
-      printf("\nSkipping %d...\n", skip);
-      i += skip;
+    if (buffer[i] == 'o' && buffer[i - 1] == 'd') {
+      const uint skip = check_for_match_do(file_size, buffer, i, &active);
+      if (skip > 0) {
+        printf("\nSkipping do %d...\n", skip);
+        i += skip;
+      }
+    } else if (buffer[i] == 'm' && active) {
+      const uint skip = check_for_match_mul(file_size, buffer, i, &rv);
+      if (skip > 0) {
+        printf("\nSkipping mul %d...\n", skip);
+        i += skip;
+      }
+    } else {
+      continue;
     }
   }
 
   printf("Result: %lld\n", rv);
 }
 
-const uint check_for_match(const uint buffer_size, const char buffer[],
-                           const uint start_idx, long long *result) {
+const uint check_for_match_do(const uint buffer_size, const char buffer[],
+                              const uint start_idx, bool *active) {
+  const char case_dont[] = {'n', '\'', 't', '(', ')'};
+
+  // Checking do
+  if (buffer[start_idx + 1] == '(' && buffer[start_idx + 2] == ')') {
+    *active = true;
+    return 0;
+  }
+
+  // Checking don't
+  for (int i = 0; i < sizeof(case_dont); ++i) {
+    if (buffer[start_idx + i + 1] != case_dont[i]) {
+      return i;
+    }
+  }
+
+  *active = false;
+  return 0;
+}
+
+// Part one
+const uint check_for_match_mul(const uint buffer_size, const char buffer[],
+                               const uint start_idx, long long *result) {
 
   bool first_number = true;
   char first_multiplier[10] = {'\0'};
