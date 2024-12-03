@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
   printf("Result: %lld\n", rv);
 }
 
+// Part two
 const uint check_for_match_do(const uint buffer_size, const char buffer[],
                               const uint start_idx, bool *active) {
   const char case_dont[] = {'n', '\'', 't', '(', ')'};
