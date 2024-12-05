@@ -5,6 +5,7 @@ project(day-4)
 file(GLOB_RECURSE sources src/*.c)
 
 set(OUTPUT_BINARY main)
+set(CMAKE_C_COMPILER "clang")
 set(CMAKE_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_OUTPUT_DIR})
