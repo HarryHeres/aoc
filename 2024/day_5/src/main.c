@@ -60,13 +60,33 @@ int main(void) {
       }
     }
 
-    if (is_ok == true) {
-      printf("Sequence %d is OK\n", sequence_number++);
-      const uint16_t middle = array_list_get(sequence, sequence->count / 2);
-      printf("Middle value: %d\n", middle);
-      result += middle;
-    } else {
+    // Part one
+    /* if (is_ok == true) { */
+    /*   printf("Sequence %d is OK\n", sequence_number++); */
+    /*   const uint16_t middle = array_list_get(sequence, sequence->count / 2); */
+    /*   printf("Middle value: %d\n", middle); */
+    /*   result += middle; */
+    /* } else { */
+    /*   printf("Sequence %d is NOT OK\n", sequence_number++); */
+    /* } */
+
+    // Part two
+    if (is_ok == false) {
       printf("Sequence %d is NOT OK\n", sequence_number++);
+
+      // Find first occurence that has n/2 numbers in front of it based on the rulse
+      uint16_t middle = 0;
+      uint16_t curr_number = 0;
+      for (int16_t i = sequence->count; i >= 0; --i) {
+        curr_number = array_list_get(sequence, i);
+        if (count_occurences_in_front(rules, sequence, curr_number) == sequence->count / 2) {
+          middle = curr_number;
+          break;
+        }
+      }
+
+      printf("New middle value: %d\n", middle);
+      result += middle;
     }
   }
 
@@ -126,4 +146,20 @@ ArrayList* parse_page_sequence(char* line) {
   printf("\n");
 
   return list;
+}
+
+uint16_t count_occurences_in_front(const Map* rules, const ArrayList* sequence, const uint16_t number) {
+  uint16_t occurences = 0;
+  uint16_t curr_number = 0;
+  for (uint16_t i = 0; i < sequence->count; ++i) {
+    curr_number = array_list_get(sequence, i);
+    if (curr_number == number) {
+      continue;
+    }
+
+    if (map_contains(rules, number, curr_number) == true) {
+      occurences++;
+    }
+  }
+  return occurences;
 }

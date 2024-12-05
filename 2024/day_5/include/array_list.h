@@ -14,7 +14,7 @@ ArrayList* array_list_create(const uint16_t capacity);
 
 void array_list_add(ArrayList* this, const uint16_t value);
 
-uint16_t array_list_get(ArrayList* this, const uint16_t index);
+uint16_t array_list_get(const ArrayList* this, const uint16_t index);
 
 bool array_list_contains(const ArrayList* this, const uint16_t value);
 

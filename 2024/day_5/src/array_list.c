@@ -27,7 +27,7 @@ void array_list_add(ArrayList* this, uint16_t value) {
   this->head[this->count++] = value;
 }
 
-uint16_t array_list_get(ArrayList* this, const uint16_t index) {
+uint16_t array_list_get(const ArrayList* this, const uint16_t index) {
   if (index > this->count) {
     printf("Invalid array list index\n");
     return 0;
