@@ -8,9 +8,9 @@
 #include <sys/types.h>
 
 int main(void) {
-  FILE* file = fopen("data/input_test.txt", "r");
-  const uint16_t rows = 10;
-  const uint16_t columns = 10;
+  FILE* file = fopen("data/input_test_2.txt", "r");
+  const uint16_t rows = 6;
+  const uint16_t columns = 6;
   const uint32_t map_size = rows * columns;
 
   char map[map_size];
@@ -62,11 +62,11 @@ uint32_t find_obstruction_places(char* map, const uint32_t rows, const uint32_t 
   for (uint32_t i = 0; i < rows * columns; ++i) {
     if (map[i] == '.') {
       printf("Testing %d\n", i);
-      map[i] = '#';
+      map[i] = 'O';
 
       if (contains_cycle(map, rows, columns, start_x, start_y) == true) {
         ++result;
-        printf("Cycle found on %d\n", i);
+        printf("Cycle found on %d\n\n", i);
       }
 
       map[i] = '.';
@@ -84,30 +84,48 @@ bool contains_cycle(char* map, const uint32_t rows, const uint32_t columns, cons
   uint32_t curr_x = start_x;
   uint32_t curr_y = start_y;
 
+  int32_t next_x = 0;
+  int32_t next_y = 0;
+
   char* curr_char = NULL;
   char next_char;
   char map_copy[rows * columns];
   memcpy(map_copy, map, rows * columns);
 
+  uint16_t visited[rows * columns];
+  memset(visited, 0, sizeof(visited));
+
+  int32_t curr_idx = 0;
+  int32_t next_idx = 0;
+
   while (true) {
-    if (curr_x == 0 || curr_x == rows || curr_y == 0 || curr_y == columns) {
+    next_x = curr_x + DIRECTIONS[direction].x;
+    next_y = curr_y + DIRECTIONS[direction].y;
+
+    if (next_x < 0 || (uint32_t)next_x == columns || next_y < 0 || (uint32_t)next_y == rows) {
       break;
     }
 
-    curr_char = &map_copy[curr_x + (curr_y * columns)];
-    next_char = map_copy[(curr_x + DIRECTIONS[direction].x) + ((curr_y + DIRECTIONS[direction].y) * columns)];
-    if (next_char == '#') {
+    curr_idx = curr_x + (curr_y * columns);
+    next_idx = next_x + (next_y * columns);
+
+    curr_char = &map_copy[curr_idx];
+    next_char = map_copy[next_idx];
+
+    while (next_char == '#' || next_char == 'O') {
       direction = (direction + 1) % (sizeof(DIRECTIONS) / sizeof(Direction));
-      next_char = map_copy[(curr_x + DIRECTIONS[direction].x) + ((curr_y + DIRECTIONS[direction].y) * columns)];
+      next_char = map_copy[curr_x + DIRECTIONS[direction].x + (curr_y + DIRECTIONS[direction].y) * columns)];
     }
 
-    if (*curr_char == 'X' && next_char == 'X') {
+    if (*curr_char == '.') {
+      *curr_char = 'X';
+    }
+
+    visited[curr_idx] += 1;
+
+    if (visited[curr_idx] > 3) {
       rv = true;
       break;
-    }
-
-    if (*curr_char != 'X') {
-      *curr_char = 'X';
     }
 
     curr_x += DIRECTIONS[direction].x;
@@ -121,7 +139,6 @@ bool contains_cycle(char* map, const uint32_t rows, const uint32_t columns, cons
       }
       printf("%c", map_copy[i]);
     }
-    printf("\n");
     printf("\n");
   }
 
