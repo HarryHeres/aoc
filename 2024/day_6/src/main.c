@@ -8,9 +8,9 @@
 #include <sys/types.h>
 
 int main(void) {
-  FILE* file = fopen("data/input_test_2.txt", "r");
-  const uint16_t rows = 6;
-  const uint16_t columns = 6;
+  FILE* file = fopen("data/input.txt", "r");
+  const uint16_t rows = 130;
+  const uint16_t columns = 130;
   const uint32_t map_size = rows * columns;
 
   char map[map_size];
@@ -114,7 +114,7 @@ bool contains_cycle(char* map, const uint32_t rows, const uint32_t columns, cons
 
     while (next_char == '#' || next_char == 'O') {
       direction = (direction + 1) % (sizeof(DIRECTIONS) / sizeof(Direction));
-      next_char = map_copy[curr_x + DIRECTIONS[direction].x + (curr_y + DIRECTIONS[direction].y) * columns)];
+      next_char = map_copy[curr_x + DIRECTIONS[direction].x + (curr_y + DIRECTIONS[direction].y) * columns];
     }
 
     if (*curr_char == '.') {
