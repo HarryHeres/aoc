@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(day-4)
+project(aoc)
 
 file(GLOB_RECURSE sources src/*.c ../libs/src/*.c)
 
