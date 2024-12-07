@@ -15,6 +15,9 @@ void sequence_add_value(Sequence* this, const uint32_t value);
 
 bool sequence_is_valid(Sequence* this);
 
+//Part one
+/* void apply_operator_mask(Sequence* this, uint32_t mask); */
+
 void apply_operator_mask(Sequence* this, uint32_t mask);
 
 bool sequence_test_equation(Sequence* this);
