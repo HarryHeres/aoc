@@ -54,26 +54,67 @@ void check_for_antennas(const char* map, const char frequency, const uint32_t an
       if (i == antenna_x && j == antenna_y) {
         continue;
       }
+
+      // Part one
+      /* if (map[i + j * COLS] == frequency) { */
+      /*   const int32_t diff_x = (int32_t)antenna_x - (int32_t)i; */
+      /*   const int32_t diff_y = (int32_t)antenna_y - (int32_t)j; */
+
+      /*   uint32_t antinode_x = i - diff_x; */
+      /*   uint32_t antinode_y = j - diff_y; */
+
+      /*   if (antinode_x < COLS && antinode_y < ROWS) { */
+      /*     if (!array_list_contains(antinodes, antinode_x + antinode_y * COLS)) { */
+      /*       array_list_add(antinodes, antinode_x + antinode_y * COLS); */
+      /*     } */
+      /*   } */
+
+      /*   antinode_x = antenna_x + diff_x; */
+      /*   antinode_y = antenna_y + diff_y; */
+
+      /*   if (antinode_x < COLS && antinode_y < ROWS) { */
+      /*     if (!array_list_contains(antinodes, antinode_x + antinode_y * COLS)) { */
+      /*       array_list_add(antinodes, antinode_x + antinode_y * COLS); */
+      /*     } */
+      /*   } */
+      /* } */
+
+      // Part two
       if (map[i + j * COLS] == frequency) {
+        // Add first antenna
+        if (!array_list_contains(antinodes, antenna_x + antenna_y * COLS)) {
+          array_list_add(antinodes, antenna_x + antenna_y * COLS);
+        }
+
+        // Add found antenna
+        if (!array_list_contains(antinodes, i + j * COLS)) {
+          array_list_add(antinodes, i + j * COLS);
+        }
+
         const int32_t diff_x = (int32_t)antenna_x - (int32_t)i;
         const int32_t diff_y = (int32_t)antenna_y - (int32_t)j;
 
         uint32_t antinode_x = i - diff_x;
         uint32_t antinode_y = j - diff_y;
 
-        if (antinode_x < COLS && antinode_y < ROWS) {
+        while (antinode_x < COLS && antinode_y < ROWS) {
           if (!array_list_contains(antinodes, antinode_x + antinode_y * COLS)) {
             array_list_add(antinodes, antinode_x + antinode_y * COLS);
           }
+          antinode_x -= diff_x;
+          antinode_y -= diff_y;
         }
 
         antinode_x = antenna_x + diff_x;
         antinode_y = antenna_y + diff_y;
 
-        if (antinode_x < COLS && antinode_y < ROWS) {
+        while (antinode_x < COLS && antinode_y < ROWS) {
           if (!array_list_contains(antinodes, antinode_x + antinode_y * COLS)) {
             array_list_add(antinodes, antinode_x + antinode_y * COLS);
           }
+
+          antinode_x += diff_x;
+          antinode_y += diff_y;
         }
       }
     }
