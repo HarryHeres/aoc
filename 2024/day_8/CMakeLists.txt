@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(aoc)
 
-file(GLOB_RECURSE sources src/*.c)
+file(GLOB_RECURSE sources src/*.c ../libs/src/*.c)
 
 set(OUTPUT_BINARY main)
 set(CMAKE_C_COMPILER "clang")
