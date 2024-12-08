@@ -7,11 +7,11 @@
 #include <string.h>
 #include <sys/types.h>
 
-const uint32_t ROWS = 12;
-const uint32_t COLS = 12;
+const uint32_t ROWS = 50;
+const uint32_t COLS = 50;
 
 int main(void) {
-  FILE* file = fopen("data/input_test.txt", "r");
+  FILE* file = fopen("data/input.txt", "r");
 
   char map[ROWS * COLS];
   char line[COLS + 2];  // newline + terminator
@@ -55,8 +55,8 @@ void check_for_antennas(const char* map, const char frequency, const uint32_t an
         continue;
       }
       if (map[i + j * COLS] == frequency) {
-        const int32_t diff_x = abs((int32_t)antenna_x - (int32_t)i);
-        const int32_t diff_y = abs((int32_t)antenna_y - (int32_t)j);
+        const int32_t diff_x = (int32_t)antenna_x - (int32_t)i;
+        const int32_t diff_y = (int32_t)antenna_y - (int32_t)j;
 
         uint32_t antinode_x = i - diff_x;
         uint32_t antinode_y = j - diff_y;
