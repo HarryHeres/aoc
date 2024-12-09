@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+const uint32_t ROWS = 0;
+const uint32_t COLS = 0;
+
 int main(void) {
   FILE* file = fopen("data/input_test.txt", "r");
-  const uint16_t file_size = 100;
-  const uint16_t line_len = 10;  // including newline
+
+  printf("Hello, world!\n");
 }
