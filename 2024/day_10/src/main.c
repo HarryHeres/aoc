@@ -50,8 +50,6 @@ int main(void) {
 uint32_t find_trails(TrailPoint* map, const uint32_t start_idx) {
   uint32_t rv = 0;
 
-  map[start_idx].visited = true;
-
   if (map[start_idx].height == 9) {
     return 1;
   }
@@ -71,7 +69,7 @@ uint32_t find_trails(TrailPoint* map, const uint32_t start_idx) {
 
     curr_neighbour = &map[x + y * COLS];
 
-    if (curr_neighbour->visited == false && curr_neighbour->height - map[start_idx].height == 1) {
+    if (curr_neighbour->height - map[start_idx].height == 1) {
       rv += find_trails(map, x + y * COLS);
     }
   }
