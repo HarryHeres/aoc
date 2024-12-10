@@ -20,6 +20,8 @@ bool array_list_contains(const ArrayList *this, const uint32_t value);
 
 void array_list_clear(ArrayList *this);
 
+void array_list_print(ArrayList *this);
+
 void array_list_free(ArrayList *this);
 
 #endif
