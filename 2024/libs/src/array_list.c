@@ -24,7 +24,9 @@ void array_list_add(ArrayList *this, uint32_t value) {
     printf("Array list is full!\n");
     return;
   }
-  this->head[this->count++] = value;
+
+  this->head[this->count] = value;
+  ++this->count;
 }
 
 uint32_t array_list_get(const ArrayList *this, const uint32_t index) {

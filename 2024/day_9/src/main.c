@@ -1,5 +1,5 @@
+#include <array_list.h>
 #include <main.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,64 +9,91 @@
 const uint32_t ROWS = 0;
 const uint32_t COLS = 0;
 
-const uint32_t LINE_LEN = 5;
+const uint32_t LINE_LEN = 19999;
 
 int main(void) {
-  FILE* file = fopen("data/input_test.txt", "r");
+  FILE* file = fopen("data/input.txt", "r");
 
   char line[LINE_LEN + 2];
   memset(line, '\0', sizeof(line));
 
   fgets(line, sizeof(line), file);
 
-  uint64_t result_len = 0;
-  for (uint32_t i = 0; i < LINE_LEN; ++i) {
-    result_len += line[i] - '0';
+  uint64_t number_count = 0;
+  for (uint32_t i = 0; i < LINE_LEN; i += 2) {
+    number_count += line[i] - '0';
   }
 
-  char result[result_len];
-  memset(result, '.', sizeof(result));
-  uint32_t result_idx = 0;
+  ArrayList* result = array_list_init(number_count);
 
-  uint32_t line_idx = 0;
-  uint32_t count = 0;
+  bool is_free_space = false;
+  uint32_t line_left_idx = 0;
+  uint32_t line_right_idx = LINE_LEN - 1;
+  uint32_t count_to_write = 0;
+  uint32_t curr_count = 0;
+  uint32_t curr_id = 0;
 
-  char write_buffer[result_len];
+  uint32_t write_buffer[number_count];
   memset(write_buffer, '\0', sizeof(write_buffer));
 
-  char curr_id[(uint32_t)ceil(LINE_LEN / 2.0)];
-  uint32_t write_buffer_curr_idx = sizeof(write_buffer) - 1;
-  uint32_t to_write_count = 0;
-  uint32_t free_space_size = 0;
-  bool is_free_space = false;
+  uint32_t write_help_buffer[number_count];
+  memset(write_buffer, '\0', sizeof(write_help_buffer));
 
-  for (uint64_t i = 0; i < LINE_LEN; ++i) {
-    count = line[line_idx] - '0';
+  uint32_t write_buffer_idx = number_count - 1;
+  uint32_t write_help_buffer_idx = 0;
+  while (true) {
+    if (result->count == result->capacity) {
+      break;
+    }
+
+    count_to_write = line[line_left_idx] - '0';
 
     if (is_free_space == false) {
-      sprintf(curr_id, "%d", line_idx);
-      to_write_count = count * strlen(curr_id);
-    } else {
-      sprintf(curr_id, "%d", line_idx / 2);
-      free_space_size = line[LINE_LEN - line_idx] - '0';
-      to_write_count = free_space_size;
+      curr_id = line_left_idx / 2;
+      for (uint32_t _ = 0; _ < count_to_write; ++_) {
+        write_buffer[write_buffer_idx] = curr_id;
+        --write_buffer_idx;
+      }
+    } else if (number_count - 1 - write_buffer_idx < count_to_write) {
+      int32_t count_to_write_copy = count_to_write;
+      while (count_to_write_copy > 0) {
+        curr_count = line[line_right_idx] - '0';
+        curr_id = line_right_idx / 2;
+        for (uint32_t _ = 0; _ < curr_count; ++_) {
+          write_help_buffer[write_help_buffer_idx] = curr_id;
+          ++write_help_buffer_idx;
+        }
+
+        line_right_idx -= 2;
+        count_to_write_copy -= curr_count;
+      }
+
+      for (uint32_t i = 0; i < write_help_buffer_idx; ++i) {
+        write_buffer[write_buffer_idx] = write_help_buffer[write_help_buffer_idx - i - 1];
+        --write_buffer_idx;
+      }
+      write_help_buffer_idx = 0;
     }
 
-    write_buffer_curr_idx -= count * strlen(curr_id);
-    append_to_string(&write_buffer[write_buffer_curr_idx], curr_id, strlen(curr_id), count);
+    write_block(result, write_buffer, &write_buffer_idx, count_to_write);
+    is_free_space = !is_free_space;
+    ++line_left_idx;
+  }
+  print_result_disk(result);
 
-    for (uint32_t _ = 0; _ < to_write_count; ++_) {
-      result[result_idx] = write_buffer[write_buffer_curr_idx];
-      ++write_buffer_curr_idx;
-      ++result_idx;
-    }
-
-    line_idx = LINE_LEN - 1 - line_idx + (is_free_space ? 1 : 0);
-    is_free_space = line_idx % 2 == 0;
-    memset(curr_id, '\0', sizeof(curr_id));
+  uint64_t checksum = 0;
+  for (uint32_t i = 0; i < result->count; ++i) {
+    checksum += array_list_get(result, i) * i;
   }
 
-  print_result_disk(result);
+  printf("Checksum: %ld\n", checksum);
+}
+
+void write_block(ArrayList* result, const uint32_t* write_buffer, uint32_t* write_buffer_idx, const uint32_t count) {
+  for (uint32_t _ = 0; _ < count; ++_) {
+    array_list_add(result, write_buffer[(*write_buffer_idx) + 1]);
+    ++(*write_buffer_idx);
+  }
 }
 
 void append_to_string(char* string, char* to_append, const uint32_t len, const uint32_t count) {
@@ -77,12 +104,10 @@ void append_to_string(char* string, char* to_append, const uint32_t len, const u
   }
 }
 
-void print_result_disk(const char* disk) {
-  uint32_t idx = 0;
+void print_result_disk(const ArrayList* disk) {
   printf("Result: ");
-  while (disk[idx] != '\0') {
-    printf("%c", disk[idx]);
-    ++idx;
+  for (uint32_t i = 0; i < disk->count; ++i) {
+    printf("%d,", array_list_get(disk, i));
   }
   printf("\n");
 }

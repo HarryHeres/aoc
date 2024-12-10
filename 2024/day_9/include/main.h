@@ -1,10 +1,11 @@
 #ifndef _MAIN_
 #define _MAIN_
 
+#include <array_list.h>
 #include <stdint.h>
 
-void append_to_string(char* string, char* to_append, const uint32_t len, const uint32_t count);
+void write_block(ArrayList* result, const uint32_t* write_buffer, uint32_t* write_buffer_idx, const uint32_t count);
 
-void print_result_disk(const char* disk);
+void print_result_disk(const ArrayList* disk);
 
 #endif
