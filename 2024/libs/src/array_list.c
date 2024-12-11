@@ -4,18 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-ArrayList *array_list_init(const uint32_t capacity) {
+ArrayList *array_list_init(const uint64_t capacity) {
   ArrayList *list = (ArrayList *)malloc(sizeof(ArrayList));
   list->count = 0;
   list->capacity = capacity;
-  list->head = (uint32_t *)malloc(capacity * sizeof(uint32_t));
+  list->head = (uint64_t *)malloc(capacity * sizeof(uint64_t));
 
-  memset(list->head, 0, capacity * sizeof(uint32_t));
+  memset(list->head, 0, capacity * sizeof(uint64_t));
 
   return list;
 }
 
-void array_list_add(ArrayList *this, uint32_t value) {
+void array_list_add(ArrayList *this, uint64_t value) {
   if (this->count == this->capacity) {
     printf("Array list is full!\n");
     return;
@@ -25,7 +25,7 @@ void array_list_add(ArrayList *this, uint32_t value) {
   ++this->count;
 }
 
-uint32_t array_list_get(const ArrayList *this, const uint32_t index) {
+uint64_t array_list_get(const ArrayList *this, const uint64_t index) {
   if (index > this->capacity) {
     printf("Invalid array list index\n");
     return 0;
@@ -33,8 +33,8 @@ uint32_t array_list_get(const ArrayList *this, const uint32_t index) {
   return this->head[index];
 }
 
-bool array_list_contains(const ArrayList *this, const uint32_t value) {
-  for (uint32_t i = 0; i < this->count; ++i) {
+bool array_list_contains(const ArrayList *this, const uint64_t value) {
+  for (uint64_t i = 0; i < this->count; ++i) {
     if (this->head[i] == value) {
       return true;
     }
@@ -44,14 +44,14 @@ bool array_list_contains(const ArrayList *this, const uint32_t value) {
 }
 
 void array_list_print(ArrayList *this) {
-  for (uint32_t i = 0; i < this->count; ++i) {
+  for (uint64_t i = 0; i < this->count; ++i) {
     printf("%d", array_list_get(this, i));
   }
   printf("\n");
 }
 
 void array_list_clear(ArrayList *this) {
-  memset(this->head, 0, this->capacity * sizeof(uint32_t));
+  memset(this->head, 0, this->capacity * sizeof(uint64_t));
   this->count = 0;
 }
 

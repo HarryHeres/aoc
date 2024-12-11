@@ -4,38 +4,39 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-Map *map_create(const uint32_t capacity) {
+HashMap *hashmap_create(const uint64_t capacity) {
   if (capacity < 1) {
     return NULL;
   }
 
-  Map *map = (Map *)malloc(sizeof(Map));
-  map->capacity = capacity;
-  map->values = (ArrayList **)malloc(capacity * sizeof(ArrayList *));
+  HashMap *map = (HashMap *)malloc(sizeof(HashMap));
 
-  for (uint32_t i = 0; i < capacity; ++i) {
-    map->values[i] = array_list_init(capacity);
-  }
+  map->capacity = capacity;
+
+  map->values = (MapNode **)malloc(capacity * sizeof(MapNode *));
+  memset(map->value, 0, capacity * sizeof(MapNode *));
+
   return map;
 }
 
-void map_put(Map *this, const uint16_t key, const uint16_t value) {
-  ArrayList *values = map_get(this, key);
-  array_list_add(values, value);
+void map_put(Map *this, const uint64_t key, const MapNode *value) {
+  map->values[i] = value;
 }
 
-ArrayList *map_get(const Map *this, const uint16_t key) {
+MapNode *map_get(const Map *this, const uint64_t key) {
   return this->values[key];
 }
 
-bool map_contains(const Map *this, const uint16_t key, const uint16_t value) {
-  const ArrayList *values = this->values[key];
-  return array_list_contains(values, value);
+bool map_contains(const Map *this, const uint64_t key, const uint64_t value) {
+  const MapNode *value = this->values[key];
+  return value != NULL;
 }
 
 void map_free(Map *this) {
-  for (uint32_t i = 0; i < this->capacity; ++i) {
-    array_list_free(this->values[i]);
+  for (uint64_t i = 0; i < this->capacity; ++i) {
+    if (this->values[i] != NULL) {
+      map_node_free(this->value[i]);
+    }
   }
 
   free(this->values);

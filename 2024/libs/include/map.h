@@ -1,23 +1,23 @@
 #ifndef _MAP_
 #define _MAP_
 
-#include <array_list.h>
+#include <hashmapnode.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct {
-  uint32_t capacity;
-  ArrayList** values;
-} Map;
+typedef struct HashMap {
+  uint64_t capacity;
+  HashMapNode *values;
+} HashMap;
 
-Map* map_create(const uint32_t capacity);
+HashMap *hashmap_create(const uint32_t capacity);
 
-void map_put(Map* this, const uint16_t key, const uint16_t value);
+void hashmap_put(HashMap *this, HashMapNode *key);
 
-ArrayList* map_get(const Map* this, const uint16_t key);
+HashMapNode *hashmap_get(const HashMap *this, const HashMapNode *key);
 
-bool map_contains(const Map* this, const uint16_t key, const uint16_t value);
+bool hashmap_contains(const HashMap *this, const HashMapNode *key);
 
-void map_free(Map* this);
+void hashmap_free(HashMap *this);
 
 #endif
