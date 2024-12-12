@@ -1,6 +1,6 @@
-#include <hashmap.h>
+#include <hash_map.h>
 #include <main.h>
-#include <map.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,136 +10,83 @@
 
 const uint32_t ROWS = 0;
 const uint32_t COLS = 36;
+HashMap* LOOKUP_TABLE;
 
 int main(void) {
   FILE* file = fopen("data/input.txt", "r");
 
-  /* printf("Part one: %lld\n", part_one(file)); */
-  printf("Part two: %lld\n", part_two(file));
+  printf("Part one: %lu\n", process_stones(file, 25));
+
+  file = fopen("data/input.txt", "r");
+  printf("Part two: %lu\n", process_stones(file, 75));
 
   return EXIT_SUCCESS;
 }
 
-uint64_t part_one(FILE* file) {
-  char line[COLS + 2];
-  fgets(line, sizeof(line), file);
+uint64_t process_stones(FILE* file, const uint16_t iters) {
+  LOOKUP_TABLE = hash_map_init(UINT32_MAX);
 
-  LinkedList* stones = linked_list_init();
-
-  char* buffer;
-  uint64_t value = 0;
-  Node* node;
-  buffer = strtok(line, " ");
-  while (buffer != NULL) {
-    value = strtol(buffer, NULL, 10);
-
-    node = (Node*)malloc(sizeof(Node));
-    node->value = value;
-    node->next = NULL;
-
-    linked_list_add(stones, stones->count, node);
-    buffer = strtok(NULL, " ");
-  }
-
-  for (uint32_t i = 0; i < 25; ++i) {
-    printf("Iteration %d\n", i + 1);
-    apply_rules(stones);
-  }
-
-  /* printf("Stones: "); */
-  /* node = stones->head; */
-  /* for (uint64_t i = 0; i < stones->count; ++i) { */
-  /*   printf("%lld ", node->value); */
-  /*   node = node->next; */
-  /* } */
-  /* printf("\n"); */
-
-  return stones->count;
-}
-
-void apply_rules(LinkedList* stones) {
-  Node* stone = stones->head;
-  char value_string[100];
-  memset(value_string, 0, sizeof(value_string));
-
-  const uint64_t stone_count_copy = stones->count;
-  for (uint64_t i = 0; i < stone_count_copy; ++i) {
-    sprintf(value_string, "%lld", stone->value);
-
-    if (stone->value == 0) {
-      stone->value = 1;
-    } else if (strlen(value_string) % 2 == 0) {
-      char value_buffer[100];
-      memset(value_buffer, '\0', sizeof(value_buffer));
-      char new_stone_value[100];
-      memset(new_stone_value, '\0', sizeof(new_stone_value));
-
-      const uint32_t split_idx = strlen(value_string) / 2;
-
-      strncpy(value_buffer, value_string, split_idx);
-      strncpy(new_stone_value, &value_string[split_idx], split_idx);
-
-      Node* new_stone = (Node*)malloc(sizeof(Node));
-      new_stone->value = strtoll(new_stone_value, NULL, 10);
-      new_stone->next = stone->next;
-
-      stone->value = strtol(value_buffer, NULL, 10);
-      stone->next = new_stone;
-
-      ++stones->count;
-
-      stone = new_stone->next;
-      continue;
-    } else {
-      stone->value *= 2024;
-    }
-
-    stone = stone->next;
-  }
-}
-
-uint64_t part_two(FILE* file) {
-  char line[COLS + 2];
-  fgets(line, sizeof(line), file);
-
-  ArrayList* stones[10000];
+  uint64_t stones[100];
+  uint16_t stones_idx = 0;
   memset(stones, 0, sizeof(stones));
 
-  LinkedList* start = linked_list_init();
+  char line[COLS + 2];
+  memset(line, 0, sizeof(line));
 
-  char* buffer;
-  uint64_t value = 0;
-  Node* node;
-  buffer = strtok(line, " ");
-  while (buffer != NULL) {
-    value = strtol(buffer, NULL, 10);
+  fgets(line, sizeof(line), file);
 
-    node = (Node*)malloc(sizeof(Node));
-    node->value = value;
-    node->next = NULL;
+  char* id;
 
-    linked_list_add(start, start->count, node);
-
-    buffer = strtok(NULL, " ");
+  id = strtok(line, " ");
+  while (id != NULL) {
+    stones[stones_idx] = strtol(id, NULL, 10);
+    ++stones_idx;
+    id = strtok(NULL, " ");
   }
 
-  for (uint32_t i = 0; i < start->count; ++i) {
-    printf("Processed %d. th stone", i + 1);
-    process_stone(stones, (&start->head[i])->value, 75);
+  uint64_t sum = 0;
+  for (uint16_t i = 0; i < stones_idx; ++i) {
+    sum += process_stone(stones[i], iters);
   }
 
-  uint64_t rv = 0;
-  for (uint32_t i = 0; i < sizeof(stones) / sizeof(ArrayList*); ++i) {
-    if (stones[i] == NULL) {
-      break;
-    }
-    rv += stones[i]->head[1];
-    array_list_free(stones[i]);
-  }
-
-  linked_list_free(start);
-
-  return rv;
+  fclose(file);
+  return sum;
 }
 
-void process_stone(ArrayList** dict, const uint64_t value, const uint32_t iters) {}
+uint64_t process_stone(const uint64_t stone_id, const uint16_t remaining_iters) {
+  if (remaining_iters == 0) {
+    return 1;
+  }
+
+  // Check if table contains
+  HashMapNode* entry = hash_map_get(LOOKUP_TABLE, stone_id);
+
+  while (entry != NULL) {
+    if (entry->stone_id == stone_id && entry->remaining_iters == remaining_iters) {
+      return entry->count;
+    }
+
+    entry = entry->next;
+  }
+
+  uint64_t count = 0;
+  uint64_t buffer_len = (uint64_t)floor(log10(stone_id)) + 1;
+
+  entry = hash_map_node_init(stone_id, remaining_iters);
+
+  if (stone_id == 0) {
+    count = process_stone(1, remaining_iters - 1);
+  } else if (buffer_len % 2 == 0) {
+    uint64_t first_stone_id = (uint64_t)(stone_id / pow(10, (uint64_t)(buffer_len / 2.0)));
+    uint64_t second_stone_id = (uint64_t)(stone_id % (uint64_t)pow(10, (uint64_t)(buffer_len / 2.0)));
+
+    count = process_stone(first_stone_id, remaining_iters - 1) + process_stone(second_stone_id, remaining_iters - 1);
+  } else {
+    count = process_stone(stone_id * 2024, remaining_iters - 1);
+  }
+
+  entry->count = count;
+  hash_map_put(LOOKUP_TABLE, stone_id, entry);
+
+  return count;
+}
