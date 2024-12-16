@@ -79,12 +79,21 @@ bool array_list_contains(const ArrayList *const this,
   return false;
 }
 
+void array_list_remove(const ArrayList *this, const uint64_t index) {
+  if (index > this->count) {
+    printf("Invalid index to remove");
+    return;
+  }
+
+  this->head[index] = NULL;
+}
+
 void array_list_clear(ArrayList *const this) {
   memset(this->head, 0, this->capacity * sizeof(ArrayListNode *));
   this->count = 0;
 }
 
 void array_list_free(ArrayList *this) {
-  free(this->head);
+  array_list_node_free(this->head);
   free(this);
 }

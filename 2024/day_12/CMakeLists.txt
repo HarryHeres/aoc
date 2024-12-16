@@ -12,10 +12,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c17 -g -Wall -Wextra -Wfloat-conversion -pedantic")
 
 include_directories(include)
-# include_directories(../libs/include/hash_map/)
+include_directories(../libs/include/array_list/)
 
-# add_library(libhashmap ../libs/src/hash_map/hash_map.c)
+add_library(libarraylist ../libs/src/array_list/array_list.c)
 
 add_executable(${OUTPUT_BINARY} ${sources})
 
-target_link_libraries(${OUTPUT_BINARY} m)
+target_link_libraries(${OUTPUT_BINARY} m libarraylist)

@@ -19,6 +19,8 @@ ArrayListNode *array_list_get(const ArrayList *this, const uint64_t index);
 
 bool array_list_contains(const ArrayList *this, const ArrayListNode *value);
 
+void array_list_remove(const ArrayList *this, const uint64_t index);
+
 void array_list_clear(ArrayList *this);
 
 void array_list_free(ArrayList *this);
