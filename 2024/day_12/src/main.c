@@ -8,9 +8,9 @@
 #include <unistd.h>
 #include "direction.h"
 
-const char INPUT_FILENAME[] = "data/input_test_2.txt";
-const uint16_t ROWS = 4;
-const uint16_t COLS = 4;
+const char INPUT_FILENAME[] = "data/input.txt";
+const uint16_t ROWS = 140;
+const uint16_t COLS = 140;
 
 int main(void) {
   FILE* file = fopen(INPUT_FILENAME, "r");
@@ -27,10 +27,10 @@ int main(void) {
   }
 
   fseek(file, 0, SEEK_SET);
-  printf("Part one: %llu \n", part_one(file));
+  printf("Part one: %lu \n", part_one(file));
 
   fseek(file, 0, SEEK_SET);
-  printf("Part two: %llu\n", part_two(file));
+  printf("Part two: %lu\n", part_two(file));
 
   return EXIT_SUCCESS;
 }
@@ -67,6 +67,7 @@ uint64_t part_one(FILE* file) {
 }
 
 uint32_t process_region(Point** map, uint32_t start_idx) {
+  const char region = map[start_idx]->type;
   Point* list[ROWS * COLS];
   memset(list, 0, sizeof(list));
 
@@ -80,9 +81,8 @@ uint32_t process_region(Point** map, uint32_t start_idx) {
   uint32_t curr_idx = 0;
   uint32_t next_idx = 1;
   uint32_t borders_count = 0;
+  const Direction* curr_dir;
   while (curr != NULL) {
-    const Direction* curr_dir;
-
     for (uint32_t i = 0; i < sizeof(DIRECTIONS) / sizeof(Direction); ++i) {
       curr_dir = &DIRECTIONS[i];
 
@@ -95,8 +95,9 @@ uint32_t process_region(Point** map, uint32_t start_idx) {
       }
 
       next = map[next_x + next_y * COLS];
-      if (next->type == curr->type) {
+      if (next->type == region) {
         if (next->visited == false) {
+          next->visited = true;
           list[next_idx] = next;
           ++next_idx;
         }
@@ -111,9 +112,9 @@ uint32_t process_region(Point** map, uint32_t start_idx) {
     curr = list[curr_idx];
   }
 
-  printf("%c: %d x %d\n", curr->type, borders_count, curr_idx + 1);
+  printf("%c: %d x %d\n", region, borders_count, curr_idx);
 
-  return borders_count * (curr_idx + 1);
+  return borders_count * curr_idx;
 }
 
 uint64_t part_two(FILE* file) {
