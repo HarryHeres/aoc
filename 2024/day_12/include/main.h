@@ -12,4 +12,6 @@ uint32_t process_region(Point** map, uint32_t start_idx);
 
 uint64_t part_two(FILE* file);
 
+uint32_t process_region_two(Point** map, uint32_t start_idx);
+
 #endif
