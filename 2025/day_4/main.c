@@ -9,11 +9,6 @@ typedef struct {
 
 } Graph;
 
-typedef struct {
-  size_t row;
-  size_t col;
-} Point;
-
 void free_graph(Graph *graph) {
   if (graph == NULL) {
     return;
