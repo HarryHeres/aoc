@@ -9,6 +9,45 @@ typedef struct {
   size_t line_count;
 } Diagram;
 
+uint64_t part_two(Diagram *diag) {
+  if (diag == NULL || diag->lines == NULL) {
+    return 0;
+  }
+
+  uint64_t counts[diag->line_len - 1];
+  memset(counts, 0, sizeof(counts));
+  for (size_t i = 0; i < diag->line_len; ++i) {
+    if (diag->lines[0][i] == 'S') {
+      diag->lines[1][i] = '|';
+      counts[i] = 1;
+      break;
+    }
+  }
+
+  for (size_t row = 1; row < diag->line_count - 1; ++row) {
+    for (size_t col = 0; col < diag->line_len; ++col) {
+      if (diag->lines[row][col] == '|') {
+        if (diag->lines[row + 1][col] == '^') {
+          diag->lines[row + 1][col - 1] = '|';
+          diag->lines[row + 1][col + 1] = '|';
+
+          counts[col - 1] += counts[col];
+          counts[col + 1] += counts[col];
+          counts[col] = 0;
+        } else {
+          diag->lines[row + 1][col] = '|';
+        }
+      }
+    }
+  }
+
+  uint64_t rv = 0;
+  for (size_t i = 0; i < diag->line_len - 1; ++i) {
+    rv += counts[i];
+  }
+  return rv;
+}
+
 uint64_t part_one(Diagram *diag) {
   if (diag == NULL || diag->lines == NULL) {
     return 0;
@@ -82,6 +121,7 @@ int main() {
 
   Diagram *diag = parse_input(input);
   printf("Part one: %llu\n", part_one(diag));
+  printf("Part two: %llu\n", part_two(diag));
 
   for (int i = 0; i < diag->line_count; ++i) {
     free(diag->lines[i]);
