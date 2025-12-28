@@ -1,2 +1,1 @@
-# Advent of Code
-My solutions throughout the years (started in 2023)
+# Project migrated to [Codeberg](https://codeberg.org/harryheres/aoc)
